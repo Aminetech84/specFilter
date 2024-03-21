@@ -11,6 +11,7 @@ const mongoURI = 'mongodb+srv://aminetech84:Azer1st628@cluster0.tptbq.mongodb.ne
 
 
 
+
 mongoose.connect(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true})
 .then(() => console.log('MongoDB Atlas connected'))
 .catch((err) => console.log(err));
