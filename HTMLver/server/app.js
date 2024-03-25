@@ -19,7 +19,13 @@ const mongoURI = 'mongodb+srv://aminetech84:Azer1st628@cluster0.tptbq.mongodb.ne
 
 // http://localhost:5000/api/specialties
 
+<<<<<<< HEAD
 mongoose.connect(mongoURI)
+=======
+
+
+mongoose.connect(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true})
+>>>>>>> ebb51706f5a771080df8a6fc4aac48bd0cf69cd4
 .then(() => console.log('MongoDB Atlas connected'))
 .catch((err) => console.log(err));
 
