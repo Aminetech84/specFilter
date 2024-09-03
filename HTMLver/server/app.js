@@ -1,7 +1,7 @@
 const express = require("express");
 //const router= express.Router();
 const mongoose = require("mongoose");
-const cors = require('cors')
+const cors = require("cors");
 //const specialtyController = require('./controllers/specialtyController');
 
 //const Specialty = require('./models/Specialty');
@@ -19,7 +19,6 @@ app.use(express.json());
 const mongoURI =
   "mongodb+srv://aminetech84:Azer1st628@cluster0.tptbq.mongodb.net/test?retryWrites=true&w=majority";
 
-  
 // http://localhost:5000/api/specialties
 
 // Connect to MongoDB Atlas
@@ -30,10 +29,19 @@ mongoose
 
 // DB Schema
 const specialtySchema = new mongoose.Schema({
+  number: Number,
+  code: String,
+  name: String,
+  qualification: Number,
+  duration: Number,
+  conditions: String,
+});
+
+/*const specialtySchema = new mongoose.Schema({
   name: String,
   description: String,
   requirements: String
-});
+});*/
 
 const Specialty = mongoose.model("Specialty", specialtySchema);
 
@@ -79,10 +87,10 @@ app.post("/api/specialties", async (req, res) => {
     requirements: req.body.requirements
   });*/
   try {
-    
-    const { name, description, requirements } = req.body;
+    const { number, code, name, qualification, duration, conditions } =
+      req.body;
 
-    const newSpecialty = new Specialty({ name, description, requirements });
+    const newSpecialty = new Specialty({ number, code, name, qualification, duration, conditions });
     const addedSpecialty = await newSpecialty.save();
     res.status(201).json(addedSpecialty);
   } catch (error) {
@@ -92,12 +100,12 @@ app.post("/api/specialties", async (req, res) => {
 });
 
 app.put("/api/specialties/:id", async (req, res) => {
-  const { name, description, requirements } = req.body;
+  const { number, code, name, qualification, duration, conditions } = req.body;
   try {
     const { id } = req.params;
     const updatedSpecialty = await Specialty.findByIdAndUpdate(
       id,
-      { name, description, requirements },
+      { number, code, name, qualification, duration, conditions },
       { new: true, runValidators: true }
     );
     if (!updatedSpecialty) {

@@ -102,7 +102,7 @@ const name = new Speciality('TAG1203','امانة','3','18 شهرًا',middle);
 const name1 = new Speciality('TAG1203','امانة','3','18 شهرًا',middle);
 const name2 = new Speciality('TAG1203','امانة','3','18 شهرًا',middle);
 
-console.log(name);
+//console.log(name);
 //specs.filter
 //feilds>neches>trades
 
