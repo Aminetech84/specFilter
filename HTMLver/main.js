@@ -1,6 +1,60 @@
 //import { specs } from "./list.js";
 //const list1 = require('list');
 
+// Get references to DOM elements
+/*let addToDoButton = document.getElementById("addToDo");*/
+let toDoContainer = document.getElementById("toDoContainer");
+let inputField = document.getElementById("search");
+let dataTable =  document.getElementById("mytable");
+let dataError =  document.getElementById("error");
+
+// Function to store specialties on the server
+async function storeSpecialty(
+  specialtyNumber,
+  specialtyCode,
+  specialtyName,
+  specialtyQualification,
+  specialtyDuration,
+  specialtyConditions
+) {
+  let specialtyData = {
+    number: specialtyNumber,
+    code: specialtyCode,
+    name: specialtyName,
+    qualification: specialtyQualification,
+    duration: specialtyDuration,
+    conditions: specialtyConditions,
+  };
+
+  try {
+    const response = await fetch(
+      "https://todoapp123-48ha.onrender.com/api/tasks",
+      {
+        method: "POST",
+        headers: {
+          "content-Type": "application/json",
+        },
+        body: JSON.stringify(specialtyNumber,
+          specialtyCode,
+          specialtyName,
+          specialtyQualification,
+          specialtyDuration,
+          specialtyConditions),
+      }
+    );
+
+    if (response.ok) {
+      // Task stored successfully
+      displayTasks(await retrieveSpecialties());
+    } else {
+      console.error("Error storing task", response.statusText);
+    }
+  } catch (err) {
+    console.error("Network error", err);
+  }
+}
+
+// Function to retrieve specialties from the server
 async function retrieveSpecialties() {
   try {
     const response = await fetch("http://localhost:5000/api/specialties");
@@ -17,55 +71,93 @@ async function retrieveSpecialties() {
     console.error("Network error", err);
     return {};
   }
-  console.log('1');
-  
 }
 
-retrieveSpecialties()
-//alert('Hello')
+// Function to display retrieved tasks
+function displaySpecialties(specialties) {
+ dataTable.innerHTML = ""; //Clear existing tasks before displaying new ones.
+ dataTable.innerHTML = `
+ <tr>
+     <td>الرقم</td>
+     <td>رمز التخصص</td>
+     <td>اسم التخصص</td>
+     <td>مستوى دراسي</td>
+     <td>مدة التكوين</td>
+     <td>شروط الالتحاق</td>
+ </tr>
+`;
 
-// Show table data
-
-function showable(curarray) {
-  document.getElementById("mytable").innerHTML = `
-        <tr>
-            <td>الرمز</td>
-            <td>اسم التخصص</td>
-            <td>مدة التكوين</td>
-            <td>شروط الالتحاق</td>
-        </tr>
-    `;
-
-  // For checking array is empty
-  if (curarray == "") {
-    document.getElementById("error").innerHTML = `NOT FOUND!`;
-  } else {
-    document.getElementById("error").innerHTML = "";
-    for (let i = 0; i < curarray.length; i++) {
-      document.getElementById("mytable").innerHTML += `
-        <tr>
-            <td>${curarray[i].code}</td>
-            <td>${curarray[i].name}</td>
-            <td>${curarray[i].duration}</td>
-            <td>${curarray[i].condition}</td>
-        </tr>
-    `;
-    }
-  }
+// For checking array is empty
+if (specialties === 0) {
+dataError.innerHTML = `NOT FOUND!`;
+} else {
+dataError.innerHTML = "";
+for (let i = 0; i < specialties.length; i++) {
+dataTable.innerHTML += `
+ <tr>
+ <td>${specialties[i].number}</td>
+     <td>${specialties[i].code}</td>
+     <td>${specialties[i].name}</td>
+     <td>${specialties[i].qualification}</td>
+     <td>${specialties[i].duration}</td>
+     <td>${specialties[i].conditions}</td>
+ </tr>
+`;
+}
 }
 
-//showable(specs);
 
-// take filtered data
-
-let newarray = [];
 
 //for searching method
 
+inputField.addEventListener("keyup", function () {
+  let dataSearch = this.value.toLowerCase();
+  //console.log(specialties);
+ 
+  if (dataSearch.length === 0) {
+    displaySpecialties(specialties); // If search is empty, show all specialties
+    console.log("Search is empty", specialties);
+    
+  } else {
+  let newArray = specialties.filter(function (val) {
+   
+    return (
+      val.number.toString().includes(dataSearch) ||
+      val.code.toLowerCase().includes(dataSearch) ||
+      val.name.toLowerCase().includes(dataSearch) ||
+      val.qualification.toString().includes(dataSearch) ||
+      val.duration.toString().includes(dataSearch) ||
+      val.conditions.toLowerCase().includes(dataSearch)
+    ) 
+  });
+  displaySpecialties(newArray);
+ }
+});
+
+ //console.log(tasks);
+  /*specialties.forEach(specialty => {
+    const paragraph = document.createElement("p");
+    paragraph.innerText = specialty.name;
+    paragraph.classList.add("paragraph-styling");
+    paragraph.style.textDecoration = specialty.completed ? "line-through" : "";
+    paragraph.dataset.taskId = specialty._id;
+    toDoContainer.appendChild(paragraph);
+    
+  });*/
+}
+
+
+
+// take filtered data
+
+let newArray = [];
+
+//for searching method
+/*
 document.getElementById("search").addEventListener("keyup", function () {
   let search = this.value.toLowerCase();
   //console.log(search);
-  newarray = specs.filter(function (val) {
+  newArray = specs.filter(function (val) {
     console.log(val);
     if (
       val.code.includes(search) ||
@@ -84,3 +176,129 @@ document.getElementById("search").addEventListener("keyup", function () {
   });
   showable(newarray);
 });
+*/
+// Load tasks from local storage on page load
+window.onload = async () => {
+  const storedSpecialties = await retrieveSpecialties();
+  displaySpecialties(storedSpecialties); // Display retrieved tasks
+};
+
+/************************************* */
+
+/*
+
+
+/*
+// Function to add a new task
+function addNewTask() {
+  // ***Storing input value
+  let taskText = inputField.value.trim(); //Trim leading/trailing whitespace
+  if (taskText) {
+    storeTask(taskText); // Store task in local storage
+    inputField.value = "";
+  } else {
+    alert("Please enter a task!"); // Handle empty input
+  }
+}*/
+/*
+// Function to mark a task as complete/incomplete
+async function toggleTaskCompletion(taskElement) {
+  const id = taskElement.dataset.taskId;
+  const currentCompleted = taskElement.style.textDecoration === "line-through"
+const newCompleted = !currentCompleted
+  //const task = await retrieveTaskById(id); // Fetch the latest task data
+ // console.log(task);
+
+  //task.completed = !task.completed;
+  
+  try {
+    const response = await fetch(`https://todoapp123-48ha.onrender.com/api/tasks/${id}`, {
+      method: "PUT",
+      headers: {
+        "content-Type": "application/json",
+      },
+      body: JSON.stringify({ completed: newCompleted }),
+    });
+    
+    if (response.ok) {
+      const updatedTask = await response.json();
+      taskElement.style.textDecoration = updatedTask.completed
+      ? "line-through"
+      : "";
+    } else {
+      console.error("Error updating task", response.statusText);
+    }
+  } catch (err) {
+    console.error("Network error", err);
+  }
+}
+
+// Function to retrieve a single task by ID
+async function retrieveTaskById(id) {
+  
+  try {
+    const response = await fetch(`https://todoapp123-48ha.onrender.com/api/tasks/${id}`);
+//console.log(id);
+    if (response.ok) {
+      const task = await response.json();
+      return task;
+    } else {
+      console.error("Error retrieving task:", response.statusText);
+      return null
+    }
+  } catch (err) {
+    console.error("Network error", err);
+    return null;
+  }
+}
+
+// Function to remove a task
+async function removeTask(taskElement) {
+  const id = taskElement.dataset.taskId;
+  
+  try {
+    const response = await fetch(`https://todoapp123-48ha.onrender.com/api/tasks/${id}`, {
+      method: "DELETE",
+    });
+
+    if (response.ok) {
+      toDoContainer.removeChild(taskElement);
+    } else {
+      console.error("Error deleting task", response.statusText);
+    }
+  } catch (err) {
+    console.error("Network error", err);
+  }
+}
+
+// Event listener for adding tasks
+addToDoButton.addEventListener('click', () => {
+  const taskText = inputField.value.trim();
+  if (taskText) {
+    storeTask(taskText);
+    inputField.value = '';
+  } else {
+    alert('Please enter a task!');
+  }
+});
+
+
+
+//Event listener for task completion (click)
+toDoContainer.addEventListener("click", (event) => {
+  if (event.target.tagName === "P") {
+    toggleTaskCompletion(event.target);
+  }
+  console.log(event.target);
+});
+
+// //Event listener for task removal (double-click)
+toDoContainer.addEventListener("dblclick", (event) => {
+  if (event.target.tagName === "P") {
+    removeTask(event.target);
+  }
+});
+
+
+
+*/
