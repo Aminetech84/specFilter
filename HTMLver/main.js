@@ -28,7 +28,7 @@ async function storeSpecialty(
 
   try {
     const response = await fetch(
-      "https://todoapp123-48ha.onrender.com/api/tasks",
+      "https://specfilter.onrender.com/api/specialties",
       {
         method: "POST",
         headers: {
@@ -59,7 +59,7 @@ async function storeSpecialty(
 // Function to retrieve specialties from the server
 async function retrieveSpecialties() {
   try {
-    const response = await fetch("http://localhost:5000/api/specialties");
+    const response = await fetch("https://specfilter.onrender.com/api/specialties");
     
     if (response.ok) {
       const specialties = await response.json();
