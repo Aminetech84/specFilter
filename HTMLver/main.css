@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+input {
+  margin:0 50%;
+}
+
 #mytable {
   text-align: center;
   width: 100%;
