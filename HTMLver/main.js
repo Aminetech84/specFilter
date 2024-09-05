@@ -5,8 +5,8 @@
 /*let addToDoButton = document.getElementById("addToDo");*/
 let toDoContainer = document.getElementById("toDoContainer");
 let inputField = document.getElementById("search");
-let dataTable =  document.getElementById("mytable");
-let dataError =  document.getElementById("error");
+let dataTable = document.getElementById("mytable");
+let dataError = document.getElementById("error");
 
 // Function to store specialties on the server
 async function storeSpecialty(
@@ -34,18 +34,20 @@ async function storeSpecialty(
         headers: {
           "content-Type": "application/json",
         },
-        body: JSON.stringify(specialtyNumber,
+        body: JSON.stringify(
+          specialtyNumber,
           specialtyCode,
           specialtyName,
           specialtyQualification,
           specialtyDuration,
-          specialtyConditions),
+          specialtyConditions
+        ),
       }
     );
 
     if (response.ok) {
       // Task stored successfully
-      displayTasks(await retrieveSpecialties());
+      displaySpecialties(await retrieveSpecialties());
     } else {
       console.error("Error storing task", response.statusText);
     }
@@ -58,7 +60,7 @@ async function storeSpecialty(
 async function retrieveSpecialties() {
   try {
     const response = await fetch("http://localhost:5000/api/specialties");
-
+    
     if (response.ok) {
       const specialties = await response.json();
       console.log(specialties);
@@ -72,11 +74,28 @@ async function retrieveSpecialties() {
     return {};
   }
 }
+const storedSpecialties = await retrieveSpecialties();
+
+// Function to filter specialties
+function filterSpecialties (specialties, searchTerm) {
+  const searchTermLowercase = searchTerm.toLowerCase();
+  return specialties.filter((specialty) => {
+    const specialtyValues = [
+      specialty.number.toString(),
+      specialty.code.toLowerCase(),
+      specialty.name.toLowerCase(),
+      specialty.qualification.toString(),
+      specialty.duration.toString(),
+      specialty.conditions.toLowerCase(),
+    ];
+    return specialtyValues.some(value => value.includes(searchTermLowercase));
+  });
+}
 
 // Function to display retrieved tasks
 function displaySpecialties(specialties) {
- dataTable.innerHTML = ""; //Clear existing tasks before displaying new ones.
- dataTable.innerHTML = `
+  dataTable.innerHTML = ""; //Clear existing tasks before displaying new ones.
+  dataTable.innerHTML = `
  <tr>
      <td>الرقم</td>
      <td>رمز التخصص</td>
@@ -87,13 +106,13 @@ function displaySpecialties(specialties) {
  </tr>
 `;
 
-// For checking array is empty
-if (specialties === 0) {
-dataError.innerHTML = `NOT FOUND!`;
-} else {
-dataError.innerHTML = "";
-for (let i = 0; i < specialties.length; i++) {
-dataTable.innerHTML += `
+  // For checking array is empty
+  if (specialties.length === 0) {
+    dataError.innerHTML = `No results found for your search!`;
+  } else {
+    dataError.innerHTML = "";
+    for (let i = 0; i < specialties.length; i++) {
+      dataTable.innerHTML += `
  <tr>
  <td>${specialties[i].number}</td>
      <td>${specialties[i].code}</td>
@@ -103,85 +122,69 @@ dataTable.innerHTML += `
      <td>${specialties[i].conditions}</td>
  </tr>
 `;
-}
+    }
+  }
+
 }
 
+//console.log(storedSpecialties);
 
 
 //for searching method
-
-inputField.addEventListener("keyup", function () {
-  let dataSearch = this.value.toLowerCase();
+inputField.addEventListener("input", function () {
+  const searchTerm = this.value;
   //console.log(specialties);
- 
-  if (dataSearch.length === 0) {
-    displaySpecialties(specialties); // If search is empty, show all specialties
-    console.log("Search is empty", specialties);
-    
-  } else {
-  let newArray = specialties.filter(function (val) {
-   
-    return (
-      val.number.toString().includes(dataSearch) ||
-      val.code.toLowerCase().includes(dataSearch) ||
-      val.name.toLowerCase().includes(dataSearch) ||
-      val.qualification.toString().includes(dataSearch) ||
-      val.duration.toString().includes(dataSearch) ||
-      val.conditions.toLowerCase().includes(dataSearch)
-    ) 
-  });
-  displaySpecialties(newArray);
- }
+const filteredSpecialties = filterSpecialties(storedSpecialties, searchTerm);
+displaySpecialties(filteredSpecialties);
+
 });
 
- //console.log(tasks);
-  /*specialties.forEach(specialty => {
-    const paragraph = document.createElement("p");
-    paragraph.innerText = specialty.name;
-    paragraph.classList.add("paragraph-styling");
-    paragraph.style.textDecoration = specialty.completed ? "line-through" : "";
-    paragraph.dataset.taskId = specialty._id;
-    toDoContainer.appendChild(paragraph);
-    
-  });*/
-}
+// Load tasks from local storage on page load
+window.onload = async () => {
+ // const storedSpecialties = await retrieveSpecialties();
+  displaySpecialties(storedSpecialties); // Display retrieved tasks
+};
 
-
-
-// take filtered data
-
-let newArray = [];
+/********************************** */
+//console.log(tasks);
+/*specialties.forEach(specialty => {
+   const paragraph = document.createElement("p");
+   paragraph.innerText = specialty.name;
+   paragraph.classList.add("paragraph-styling");
+   paragraph.style.textDecoration = specialty.completed ? "line-through" : "";
+   paragraph.dataset.taskId = specialty._id;
+   toDoContainer.appendChild(paragraph);
+   
+ });*/
 
 //for searching method
 /*
-document.getElementById("search").addEventListener("keyup", function () {
-  let search = this.value.toLowerCase();
-  //console.log(search);
-  newArray = specs.filter(function (val) {
-    console.log(val);
-    if (
-      val.code.includes(search) ||
-      val.name.includes(search) ||
-      val.condition.includes(search) ||
-      val.duration.includes(search)
-    ) {
-      const newobj = {
-        code: val.code,
-        name: val.name,
-        duration: val.duration,
-        condition: val.condition,
-      };
-      return newobj;
-    }
+  document.getElementById("search").addEventListener("keyup", function () {
+    let search = this.value.toLowerCase();
+    //console.log(search);
+    newArray = specs.filter(function (val) {
+      console.log(val);
+      if (
+        val.code.includes(search) ||
+        val.name.includes(search) ||
+        val.condition.includes(search) ||
+        val.duration.includes(search)
+      ) {
+        const newobj = {
+          code: val.code,
+          name: val.name,
+          duration: val.duration,
+          condition: val.condition,
+        };
+        return newobj;
+      }
+    });
+    showable(newarray);
   });
-  showable(newarray);
-});
-*/
-// Load tasks from local storage on page load
-window.onload = async () => {
-  const storedSpecialties = await retrieveSpecialties();
-  displaySpecialties(storedSpecialties); // Display retrieved tasks
-};
+
+
+
+
 
 /************************************* */
 
