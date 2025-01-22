@@ -108,7 +108,7 @@ function displaySpecialties(specialties) {
 
   // For checking array is empty
   if (specialties.length === 0) {
-    dataError.innerHTML = `No results found for your search!`;
+    dataError.innerHTML = `لا يوجد تخصصات تطابق بحثك!  `;
   } else {
     dataError.innerHTML = "";
     for (let i = 0; i < specialties.length; i++) {
